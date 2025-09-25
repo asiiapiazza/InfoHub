@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   GraduationCapIcon,
   CalendarDotsIcon,
@@ -367,75 +368,91 @@ export default function App() {
             setShowMenu(true);
           }}
         >
-          <GearIcon size={40} className="hover:scale-125 transform
-                   transition duration-200 ease-in-out"/>
+          <GearIcon
+            size={40}
+            className="hover:scale-125 transform
+                   transition duration-200 ease-in-out"
+          />
         </div>
       </div>
 
-      {/* menu a comparsa per selezionare corsi */}
-      {showMenu && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-250">
-            <h2 className="text-xl font-bold mb-4">Primo anno:</h2>
-            {/* corsi primo anno */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {tempCourses
-                .filter((course) => course.anno === 1)
-                .map((course) => (
-                  <button
-                    key={course.name} // key unico
-                    onClick={() => toggleTempCourse(course.name)} // toggle tramite name
-                    className={`px-4 py-2 rounded ${
-                      course.active
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                  >
-                    {course.name}
-                  </button>
-                ))}
-            </div>
+      <AnimatePresence>
+        {/* menu a comparsa per selezionare corsi */}
+        {showMenu && (
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          >
+            <motion.div
+              key="modal"
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="bg-white rounded-lg p-6 w-250 h-200"
+            >
+              <h2 className="text-xl font-bold mb-4">Primo anno:</h2>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {tempCourses
+                  .filter((course) => course.anno === 1)
+                  .map((course) => (
+                    <button
+                      key={course.name} // key unico
+                      onClick={() => toggleTempCourse(course.name)}
+                      className={`px-4 py-2 rounded ${
+                        course.active
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-800"
+                      }`}
+                    >
+                      {course.name}
+                    </button>
+                  ))}
+              </div>
 
-            {/* corsi secondo anno */}
-            <h2 className="text-xl font-bold mb-4">Secondo anno:</h2>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {tempCourses
-                .filter((course) => course.anno === 2)
-                .map((course) => (
-                  <button
-                    key={course.name}
-                    onClick={() => toggleTempCourse(course.name)}
-                    className={`px-4 py-2 rounded ${
-                      course.active
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                  >
-                    {course.name}
-                  </button>
-                ))}
-            </div>
+              <h2 className="text-xl font-bold mb-4">Secondo anno:</h2>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {tempCourses
+                  .filter((course) => course.anno === 2)
+                  .map((course) => (
+                    <button
+                      key={course.name}
+                      onClick={() => toggleTempCourse(course.name)}
+                      className={`px-4 py-2 rounded ${
+                        course.active
+                          ? "bg-emerald-500 text-white"
+                          : "bg-gray-200 text-gray-800"
+                      }`}
+                    >
+                      {course.name}
+                    </button>
+                  ))}
+              </div>
 
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setShowMenu(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              >
-                Annulla
-              </button>
-              <button
-                onClick={saveCourses}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Salva
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setShowMenu(false)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Annulla
+                </button>
+                <button
+                  onClick={saveCourses}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Salva
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* lista di bottoni secondari dei corsi attivi */}
-      <div className="col-span-12 flex flex-wrap justify-center gap-4 mt-10">
+      <div className="col-span-12 flex  flex-wrap justify-center gap-4 mt-10">
         {corsiFirst
           .filter((course) => course.active)
           .map((course) => (
