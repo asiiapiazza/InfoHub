@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+/* globals.css */
+body {
+    background-color: #ffffff;
+    background-image: url("https://transparenttextures.com/patterns/paper-fibers.png");
+}
