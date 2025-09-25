@@ -14,6 +14,14 @@ interface Course {
   anno: number;
 }
 
+const getToday = () => {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, "0");
+  const mm = String(today.getMonth() + 1).padStart(2, "0"); // i mesi partono da 0
+  const yyyy = today.getFullYear();
+  return `${dd}-${mm}-${yyyy}`;
+};
+
 const corsi: Course[] = [
   {
     name: "Architetture Dati",
@@ -286,21 +294,50 @@ export default function App() {
     );
   };
 
+  const [query, setQuery] = useState("");
+
+  <input
+    type="text"
+    value={query}
+    onChange={(e) => setQuery(e.target.value)}
+  />;
+
   // Salva le modifiche e chiudi il menu
   const saveCourses = () => {
     setCourses(tempCourses);
     setShowMenu(false);
   };
 
+  const url = `https://gestioneorari.didattica.unimib.it/PortaleStudentiUnimib/index.php?view=easycourse&form-type=corso&include=corso&txtcurr=1+-+PERCORSO+COMUNE&anno=2025&scuola=AreaScientifica-Informatica&corso=F1802Q&anno2[]=GGG|1&date=${getToday()}&_lang=it&list=&week_grid_type=-1&ar_codes_=&ar_select_=&col_cells=0&empty_box=0&only_grid=0&highlighted_date=0&all_events=0&faculty_group=0#`;
+
   return (
-    <div className="m-8 grid grid-cols-12 gap-10">
+    <div className="m-8 grid grid-cols-13 gap-10">
       {/* titolo */}
-      <div className="col-span-12 text-black font-bold text-6xl text-center">
+      <div className="col-span-13 text-black font-bold text-6xl text-center">
         InfoLink
       </div>
 
+      {/* lista di bottoni secondari dei corsi attivi */}
+      <div className="col-span-7 flex col-start-4 flex-wrap justify-center gap-4 mt-3 mx-auto">
+        {corsiFirst
+          .filter((course) => course.active)
+          .map((course) => (
+            <button
+              key={course.name}
+              onClick={() =>
+                window.open(course.link, "_blank", "noopener,noreferrer")
+              }
+              className="px-6 py-3 bg-blue-500 text-white rounded 
+                   hover:bg-blue-500 hover:scale-105 transform
+                   transition duration-150 ease-in-out cursor-pointer"
+            >
+              {course.name}
+            </button>
+          ))}
+      </div>
+
       {/* bottoni principali */}
-      <div className="flex flex-wrap col-span-12 justify-center gap-10">
+      <div className="flex flex-wrap col-span-13 justify-center gap-10">
         <a
           className="hover:scale-105 transform
                    transition duration-150 ease-in-out"
@@ -318,10 +355,9 @@ export default function App() {
 
         <a
           target="_blank"
-          className="hover:scale-105 transform
-                   transition duration-150 ease-in-out"
+          className="hover:scale-105 transform transition duration-150 ease-in-out"
           rel="noopener noreferrer"
-          href="https://gestioneorari.didattica.unimib.it/PortaleStudentiUnimib/index.php?view=easycourse&form-type=corso&include=corso&txtcurr=1+-+PERCORSO+COMUNE&anno=2025&scuola=AreaScientifica-Informatica&corso=F1802Q&anno2%5B%5D=GGG%7C1&date=25-09-2025&periodo_didattico=&_lang=it&list=&week_grid_type=-1&ar_codes_=&ar_select_=&col_cells=0&empty_box=0&only_grid=0&highlighted_date=0&all_events=0&faculty_group=0#"
+          href={url} // URL dinamico con data aggiornata
         >
           <div className="col-span-2 bg-gray-200 rounded-lg p-4 flex flex-col items-center hover:bg-gray-300 cursor-pointer">
             <div className="mb-2">
@@ -377,7 +413,6 @@ export default function App() {
       </div>
 
       <AnimatePresence>
-        {/* menu a comparsa per selezionare corsi */}
         {showMenu && (
           <motion.div
             key="backdrop"
@@ -393,17 +428,34 @@ export default function App() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="bg-white rounded-lg p-6 w-250 h-200"
+              className="bg-white rounded-lg p-6 w-[1200px] max-h-[80vh] overflow-y-auto"
             >
-              <h2 className="text-xl font-bold mb-4">Primo anno:</h2>
+              {/* Titolo + barra di ricerca */}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold mb-2">Primo anno:</h2>
+                <div className="bg-white flex px-1 py-1 rounded-full border border-blue-500 overflow-hidden max-w-md">
+                  <input
+                    type="text"
+                    placeholder="Cerca corso..."
+                    className="w-full outline-none bg-white pl-4 text-sm"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Primo anno */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {tempCourses
                   .filter((course) => course.anno === 1)
+                  .filter((course) =>
+                    course.name.toLowerCase().includes(query.toLowerCase())
+                  )
                   .map((course) => (
                     <button
-                      key={course.name} // key unico
+                      key={course.name}
                       onClick={() => toggleTempCourse(course.name)}
-                      className={`px-4 py-2 rounded ${
+                      className={`px-4 py-2 rounded cursor-pointer ${
                         course.active
                           ? "bg-blue-500 text-white"
                           : "bg-gray-200 text-gray-800"
@@ -414,15 +466,19 @@ export default function App() {
                   ))}
               </div>
 
-              <h2 className="text-xl font-bold mb-4">Secondo anno:</h2>
+              {/* Secondo anno */}
+              <h2 className="text-lg font-semibold mb-2 mt-7">Secondo anno:</h2>
               <div className="flex flex-wrap gap-2 mb-4">
                 {tempCourses
                   .filter((course) => course.anno === 2)
+                  .filter((course) =>
+                    course.name.toLowerCase().includes(query.toLowerCase())
+                  )
                   .map((course) => (
                     <button
                       key={course.name}
                       onClick={() => toggleTempCourse(course.name)}
-                      className={`px-4 py-2 rounded ${
+                      className={`px-4 py-2 rounded cursor-pointer ${
                         course.active
                           ? "bg-emerald-500 text-white"
                           : "bg-gray-200 text-gray-800"
@@ -433,6 +489,7 @@ export default function App() {
                   ))}
               </div>
 
+              {/* Pulsanti azione */}
               <div className="flex justify-end gap-4">
                 <button
                   onClick={() => setShowMenu(false)}
@@ -451,24 +508,6 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* lista di bottoni secondari dei corsi attivi */}
-      <div className="col-span-12 flex  flex-wrap justify-center gap-4 mt-10">
-        {corsiFirst
-          .filter((course) => course.active)
-          .map((course) => (
-            <button
-              key={course.name}
-              onClick={() =>
-                window.open(course.link, "_blank", "noopener,noreferrer")
-              }
-              className="px-6 py-3 bg-blue-500 text-white rounded 
-                   hover:bg-blue-500 hover:scale-105 transform
-                   transition duration-150 ease-in-out cursor-pointer"
-            >
-              {course.name}
-            </button>
-          ))}
-      </div>
     </div>
   );
 }
