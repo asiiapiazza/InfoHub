@@ -359,18 +359,18 @@ export default function App() {
         {corsiFirst
           .filter((course) => course.active)
           .map((course) => (
-            <button
+            <a
               key={course.name}
-              onClick={() =>
-                window.open(course.link, "_blank", "noopener,noreferrer")
-              }
-              className="w-full sm:w-64 md:w-80 md:h-20 px-6 py-3 bg-blue-400 text-white rounded
+              href={course.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-64 md:w-80 md:h-20 px-6 py-3 bg-blue-400 items-center text-center justify-center flex text-white rounded
                        hover:bg-blue-800 hover:scale-105 transform
                        transition duration-150 ease-in-out cursor-pointer shadow-lg
-                       font-raleway font-semibold text-sm uppercase"
+                       font-raleway font-semibold text-m uppercase"
             >
               {course.name}
-            </button>
+            </a>
           ))}
       </div>
 
@@ -501,7 +501,7 @@ export default function App() {
                     <button
                       key={course.name}
                       onClick={() => toggleTempCourse(course.name)}
-                      className={`px-4 py-2 rounded-lg cursor-pointer w-full md:w-auto ${
+                      className={`px-4 py-2 rounded-lg cursor-pointer mb-10w-full md:w-auto ${
                         course.active
                           ? course.anno === 1
                             ? "bg-blue-500 text-white"
