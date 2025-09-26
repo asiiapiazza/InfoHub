@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   GraduationCapIcon,
@@ -287,14 +287,25 @@ export default function App() {
   const [corsiFirst, setCourses] = useState<Course[]>(corsi);
   const [showMenu, setShowMenu] = useState(false);
   const [tempCourses, setTempCourses] = useState<Course[]>(corsi);
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("tempCourses");
+    if (saved) {
+      setTempCourses(JSON.parse(saved));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("tempCourses", JSON.stringify(tempCourses));
+  }, [tempCourses]);
+
 
   const toggleTempCourse = (courseName: string) => {
     setTempCourses((prev) =>
       prev.map((c) => (c.name === courseName ? { ...c, active: !c.active } : c))
     );
   };
-
-  const [query, setQuery] = useState("");
 
   <input
     type="text"
@@ -412,6 +423,7 @@ export default function App() {
         </div>
       </div>
 
+      {/* Menu modale */}
       <AnimatePresence>
         {showMenu && (
           <motion.div
