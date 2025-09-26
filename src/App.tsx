@@ -289,6 +289,19 @@ export default function App() {
   const [tempCourses, setTempCourses] = useState<Course[]>(corsi);
   const [query, setQuery] = useState("");
 
+  const [selectedYears, setSelectedYears] = useState<number[]>([1, 2]); // di default entrambi selezionati
+
+  const toggleYear = (year: number) => {
+    setSelectedYears((prev) => {
+      if (prev.includes(year)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((y) => y !== year);
+      } else {
+        return [...prev, year];
+      }
+    });
+  };
+
   // Quando l’app si monta, carico i corsi salvati
   useEffect(() => {
     const saved = localStorage.getItem("savedCourses");
@@ -411,7 +424,7 @@ export default function App() {
           className="flex flex-col items-center bg-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-300 transition transform hover:scale-105"
         >
           <GearIcon size={40} className="mb-2" />
-          <span className="font-semibold text-center">Impostazioni</span>
+          <span className="font-semibold text-center">Imposta corsi</span>
         </div>
       </div>
 
@@ -424,6 +437,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
+            onClick={() => setShowMenu(false)}
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
           >
             <motion.div
@@ -431,19 +445,37 @@ export default function App() {
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
               transition={{ duration: 0.25 }}
               className="bg-white rounded-lg p-6 w-full sm:w-[90%] md:w-[80%] max-h-[80vh] overflow-y-auto"
             >
-              <button
-                onClick={() => setShowMenu(false)}
-                className="absolute top-4 right-4 text-gray-700 hover:text-gray-800 text-xl font-bold cursor-pointer"
-              >
-                X
-              </button>
-
               {/* Titolo + barra di ricerca */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
-                <h2 className="text-lg font-semibold">Primo anno:</h2>
+              <div className="flex justify-between items-center mb-4 gap-4">
+                {/* Toggle anni */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => toggleYear(1)}
+                    className={`text-lg font-semibold px-4 py-2 rounded-lg w-full sm:w-auto ${
+                      selectedYears.includes(1)
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-800"
+                    }`}
+                  >
+                    1 anno
+                  </button>
+
+                  <button
+                    onClick={() => toggleYear(2)}
+                    className={`text-lg font-semibold px-4 py-2 rounded-lg w-full sm:w-auto ${
+                      selectedYears.includes(2)
+                        ? "bg-emerald-500 text-white"
+                        : "bg-gray-200 text-gray-800"
+                    }`}
+                  >
+                    2 anno
+                  </button>
+                </div>
+
                 <div className="flex px-1 py-1 rounded-full border border-blue-500 overflow-hidden w-full sm:max-w-md">
                   <input
                     type="text"
@@ -455,20 +487,23 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Primo anno */}
-              <div className="flex flex-col sm:flex-row flex-wrap gap-2 mb-4">
+              {/* Lista corsi */}
+              <div className="flex flex-col sm:flex-row flex-wrap gap-2 overflow-y-auto max-h-[60vh]">
                 {tempCourses
-                  .filter((course) => course.anno === 1)
+                  .filter((course) => selectedYears.includes(course.anno))
                   .filter((course) =>
                     course.name.toLowerCase().includes(query.toLowerCase())
                   )
+
                   .map((course) => (
                     <button
                       key={course.name}
                       onClick={() => toggleTempCourse(course.name)}
                       className={`px-4 py-2 rounded-lg cursor-pointer w-full sm:w-auto ${
                         course.active
-                          ? "bg-blue-500 text-white"
+                          ? course.anno === 1
+                            ? "bg-blue-500 text-white"
+                            : "bg-emerald-500 text-white"
                           : "bg-gray-200 text-gray-800"
                       }`}
                     >
@@ -477,31 +512,14 @@ export default function App() {
                   ))}
               </div>
 
-              {/* Secondo anno */}
-              <h2 className="text-lg font-semibold mb-2 mt-7">Secondo anno:</h2>
-              <div className="flex flex-col sm:flex-row flex-wrap gap-2 mb-4">
-                {tempCourses
-                  .filter((course) => course.anno === 2)
-                  .filter((course) =>
-                    course.name.toLowerCase().includes(query.toLowerCase())
-                  )
-                  .map((course) => (
-                    <button
-                      key={course.name}
-                      onClick={() => toggleTempCourse(course.name)}
-                      className={`px-4 py-2 rounded-lg cursor-pointer w-full sm:w-auto ${
-                        course.active
-                          ? "bg-emerald-500 text-white"
-                          : "bg-gray-200 text-gray-800"
-                      }`}
-                    >
-                      {course.name}
-                    </button>
-                  ))}
-              </div>
-
-              {/* Pulsanti azione */}
-              <div className="flex flex-col sm:flex-row justify-end gap-4 mt-4">
+              {/* Pulsanti azione fissi */}
+              <div className="absolute bottom-0 left-0 w-full p-4 flex justify-end gap-4 ">
+                <button
+                  onClick={() => setShowMenu(false)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                >
+                  Annulla
+                </button>
                 <button
                   onClick={saveCourses}
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
