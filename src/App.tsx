@@ -375,12 +375,12 @@ export default function App() {
       </div>
 
       {/* Bottoni principali (icone) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-10 mb-10 w-full max-w-[1200px]">
+      <div className="flex flex-wrap justify-center gap-6 mt-10 mb-10 w-full max-w-[1200px] mx-auto">
         <a
           href="https://s3w.si.unimib.it/auth/studente/HomePageStudente.do"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
+          className="flex flex-col items-center bg-gray-200 w-50  rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
         >
           <GraduationCapIcon size={32} color="green" className="mb-2" />
           <span className="font-semibold text-center">Segreteria Online</span>
@@ -390,7 +390,7 @@ export default function App() {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
+          className="flex flex-col items-center bg-gray-200 w-50 rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
         >
           <CalendarDotsIcon size={32} color="blue" className="mb-2" />
           <span className="font-semibold text-center">Calendario Lezioni</span>
@@ -400,7 +400,7 @@ export default function App() {
           href="https://gestioneorari.didattica.unimib.it/PortaleStudentiUnimib/index.php?view=easytest&form-type=et_cdl&include=et_cdl&et_er=1&scuola=AreaScientifica-Informatica&esami_cdl=F1801Q&anno2%5B%5D=1&datefrom=23-09-2025&dateto=11-04-2026&_lang=it&list=&week_grid_type=-1&ar_codes_=&ar_select_=&col_cells=0&empty_box=0&only_grid=0&highlighted_date=0&all_events=0#"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
+          className="flex flex-col items-center bg-gray-200  w-50   rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
         >
           <CalendarDotsIcon size={32} color="red" className="mb-2" />
           <span className="font-semibold text-center">Calendario Esami</span>
@@ -410,7 +410,7 @@ export default function App() {
           href="https://esamionline.elearning.unimib.it/my/"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
+          className="flex flex-col items-center bg-gray-200 w-50  rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
         >
           <DesktopIcon size={32} color="purple" className="mb-2" />
           <span className="font-semibold text-center">Esami Online</span>
@@ -421,7 +421,7 @@ export default function App() {
             setTempCourses(corsiFirst);
             setShowMenu(true);
           }}
-          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-300 transition transform hover:scale-105"
+          className="flex flex-col items-center bg-gray-200 w-50  rounded-lg p-4 cursor-pointer hover:bg-gray-300 transition transform hover:scale-105"
         >
           <GearIcon size={40} className="mb-2" />
           <span className="font-semibold text-center">Imposta corsi</span>
