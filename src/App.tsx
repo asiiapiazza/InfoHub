@@ -447,7 +447,7 @@ export default function App() {
               exit={{ y: -50, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
               transition={{ duration: 0.25 }}
-              className="bg-white rounded-lg p-6 w-full sm:w-[90%] md:w-[80%] max-h-[80vh] overflow-y-auto"
+              className="bg-white rounded-lg p-6 w-full sm:w-[90%] md:w-[80%] max-h-[80vh] overflow-x-auto"
             >
               {/* Titolo + barra di ricerca */}
               <div className="flex justify-between items-center mb-4 gap-4">
@@ -488,18 +488,20 @@ export default function App() {
               </div>
 
               {/* Lista corsi */}
-              <div className="flex flex-col sm:flex-row flex-wrap gap-2 overflow-y-auto max-h-[60vh]">
+              <div
+                className="flex flex-col md:flex-row md:flex-wrap gap-2 
+                max-h-[60vh] overflow-y-auto md:overflow-y-visible"
+              >
                 {tempCourses
                   .filter((course) => selectedYears.includes(course.anno))
                   .filter((course) =>
                     course.name.toLowerCase().includes(query.toLowerCase())
                   )
-
                   .map((course) => (
                     <button
                       key={course.name}
                       onClick={() => toggleTempCourse(course.name)}
-                      className={`px-4 py-2 rounded-lg cursor-pointer w-full sm:w-auto ${
+                      className={`px-4 py-2 rounded-lg cursor-pointer w-full md:w-auto ${
                         course.active
                           ? course.anno === 1
                             ? "bg-blue-500 text-white"
@@ -513,21 +515,21 @@ export default function App() {
               </div>
 
               {/* Pulsanti azione fissi */}
-              <div className="absolute bottom-0 left-0 w-full p-4 flex justify-end gap-4 ">
-                <button
-                  onClick={() => setShowMenu(false)}
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                >
-                  Annulla
-                </button>
-                <button
-                  onClick={saveCourses}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  Salva
-                </button>
-              </div>
             </motion.div>
+            <div className="absolute bottom-0 left-0 w-full p-4 flex justify-end gap-4 ">
+              <button
+                onClick={() => setShowMenu(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Annulla
+              </button>
+              <button
+                onClick={saveCourses}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Salva
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
