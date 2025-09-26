@@ -289,17 +289,36 @@ export default function App() {
   const [tempCourses, setTempCourses] = useState<Course[]>(corsi);
   const [query, setQuery] = useState("");
 
+  // Quando l’app si monta, carico i corsi salvati
   useEffect(() => {
-    const saved = localStorage.getItem("tempCourses");
+    const saved = localStorage.getItem("savedCourses");
     if (saved) {
-      setTempCourses(JSON.parse(saved));
+      const selectedCourses = JSON.parse(saved);
+      setCourses((prev) =>
+        prev.map((c) => ({
+          ...c,
+          active: selectedCourses.some(
+            (sc: { name: string }) => sc.name === c.name
+          ),
+        }))
+      );
     }
   }, []);
 
+  // Quando apro il modale, creo una copia aggiornata di corsiFirst
   useEffect(() => {
-    localStorage.setItem("tempCourses", JSON.stringify(tempCourses));
-  }, [tempCourses]);
+    if (showMenu) {
+      setTempCourses(corsiFirst);
+    }
+  }, [showMenu]);
 
+  // Quando premo Salva, aggiorno sia corsiFirst che localStorage
+  const saveCourses = () => {
+    const selected = tempCourses.filter((c) => c.active);
+    localStorage.setItem("savedCourses", JSON.stringify(selected));
+    setCourses(tempCourses); // aggiorna la lista principale
+    setShowMenu(false); // chiudi il modale
+  };
 
   const toggleTempCourse = (courseName: string) => {
     setTempCourses((prev) =>
@@ -313,23 +332,17 @@ export default function App() {
     onChange={(e) => setQuery(e.target.value)}
   />;
 
-  // Salva le modifiche e chiudi il menu
-  const saveCourses = () => {
-    setCourses(tempCourses);
-    setShowMenu(false);
-  };
-
   const url = `https://gestioneorari.didattica.unimib.it/PortaleStudentiUnimib/index.php?view=easycourse&form-type=corso&include=corso&txtcurr=1+-+PERCORSO+COMUNE&anno=2025&scuola=AreaScientifica-Informatica&corso=F1802Q&anno2[]=GGG|1&date=${getToday()}&_lang=it&list=&week_grid_type=-1&ar_codes_=&ar_select_=&col_cells=0&empty_box=0&only_grid=0&highlighted_date=0&all_events=0&faculty_group=0#`;
 
   return (
-    <div className="m-8 grid grid-cols-13 gap-10">
-      {/* titolo */}
-      <div className="col-span-13 text-black font-bold text-6xl text-center">
+    <div className="flex flex-col items-center px-4 sm:px-8 md:px-16">
+      {/* Titolo */}
+      <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center mt-10">
         InfoLink
-      </div>
+      </h1>
 
-      {/* lista di bottoni secondari dei corsi attivi */}
-      <div className="col-span-7 flex col-start-4 flex-wrap justify-center gap-4 mt-3 mx-auto">
+      {/* Bottoni corsi attivi */}
+      <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 mt-10 w-full">
         {corsiFirst
           .filter((course) => course.active)
           .map((course) => (
@@ -338,88 +351,67 @@ export default function App() {
               onClick={() =>
                 window.open(course.link, "_blank", "noopener,noreferrer")
               }
-              className="px-6 py-3 bg-blue-500 text-white rounded 
-                   hover:bg-blue-500 hover:scale-105 transform
-                   transition duration-150 ease-in-out cursor-pointer"
+              className="w-full sm:w-64 md:w-80 md:h-20 px-6 py-3 bg-blue-400 text-white rounded
+                       hover:bg-blue-800 hover:scale-105 transform
+                       transition duration-150 ease-in-out cursor-pointer shadow-lg
+                       font-raleway font-semibold text-sm uppercase"
             >
               {course.name}
             </button>
           ))}
       </div>
 
-      {/* bottoni principali */}
-      <div className="flex flex-wrap col-span-13 justify-center gap-10">
+      {/* Bottoni principali (icone) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-10 mb-10 w-full max-w-[1200px]">
         <a
-          className="hover:scale-105 transform
-                   transition duration-150 ease-in-out"
-          target="_blank"
-          rel="noopener noreferrer"
           href="https://s3w.si.unimib.it/auth/studente/HomePageStudente.do"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
         >
-          <div className="col-span-2 bg-gray-200 rounded-lg p-4 flex flex-col items-center hover:bg-gray-300 cursor-pointer">
-            <div className="mb-2">
-              <GraduationCapIcon size={32} color="green" />
-            </div>
-            <div className="text-center font-semibold">Segreteria Online</div>
-          </div>
+          <GraduationCapIcon size={32} color="green" className="mb-2" />
+          <span className="font-semibold text-center">Segreteria Online</span>
         </a>
 
         <a
+          href={url}
           target="_blank"
-          className="hover:scale-105 transform transition duration-150 ease-in-out"
           rel="noopener noreferrer"
-          href={url} // URL dinamico con data aggiornata
+          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
         >
-          <div className="col-span-2 bg-gray-200 rounded-lg p-4 flex flex-col items-center hover:bg-gray-300 cursor-pointer">
-            <div className="mb-2">
-              <CalendarDotsIcon size={32} color="blue" />
-            </div>
-            <div className="text-center font-semibold">Calendario Lezioni</div>
-          </div>
+          <CalendarDotsIcon size={32} color="blue" className="mb-2" />
+          <span className="font-semibold text-center">Calendario Lezioni</span>
         </a>
 
         <a
-          target="_blank"
-          className="hover:scale-105 transform
-                   transition duration-150 ease-in-out"
-          rel="noopener noreferrer"
           href="https://gestioneorari.didattica.unimib.it/PortaleStudentiUnimib/index.php?view=easytest&form-type=et_cdl&include=et_cdl&et_er=1&scuola=AreaScientifica-Informatica&esami_cdl=F1801Q&anno2%5B%5D=1&datefrom=23-09-2025&dateto=11-04-2026&_lang=it&list=&week_grid_type=-1&ar_codes_=&ar_select_=&col_cells=0&empty_box=0&only_grid=0&highlighted_date=0&all_events=0#"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
         >
-          <div className="col-span-2 bg-gray-200 rounded-lg p-4 flex flex-col items-center hover:bg-gray-300 cursor-pointer">
-            <div className="mb-2">
-              <CalendarDotsIcon size={32} color="red" />
-            </div>
-            <div className="text-center font-semibold">Calendario Esami</div>
-          </div>
+          <CalendarDotsIcon size={32} color="red" className="mb-2" />
+          <span className="font-semibold text-center">Calendario Esami</span>
         </a>
 
         <a
-          target="_blank"
-          className="hover:scale-105 transform
-                   transition duration-150 ease-in-out"
-          rel="noopener noreferrer"
           href="https://esamionline.elearning.unimib.it/my/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 hover:bg-gray-300 transition transform hover:scale-105"
         >
-          <div className="col-span-2 bg-gray-200 rounded-lg p-4 flex flex-col items-center hover:bg-gray-300 cursor-pointer">
-            <div className="mb-2">
-              <DesktopIcon size={32} color="purple" />
-            </div>
-            <div className="text-center font-semibold">Esami Online</div>
-          </div>
+          <DesktopIcon size={32} color="purple" className="mb-2" />
+          <span className="font-semibold text-center">Esami Online</span>
         </a>
 
         <div
-          className="col-span-1 content-center cursor-pointer"
           onClick={() => {
-            setTempCourses(corsiFirst); // carica lo stato corrente nel menu
+            setTempCourses(corsiFirst);
             setShowMenu(true);
           }}
+          className="flex flex-col items-center bg-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-300 transition transform hover:scale-105"
         >
-          <GearIcon
-            size={40}
-            className="hover:scale-125 transform
-                   transition duration-200 ease-in-out"
-          />
+          <GearIcon size={40} className="mb-2" />
+          <span className="font-semibold text-center">Impostazioni</span>
         </div>
       </div>
 
@@ -432,7 +424,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
           >
             <motion.div
               key="modal"
@@ -440,12 +432,19 @@ export default function App() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="bg-white rounded-lg p-6 w-[1200px] max-h-[80vh] overflow-y-auto"
+              className="bg-white rounded-lg p-6 w-full sm:w-[90%] md:w-[80%] max-h-[80vh] overflow-y-auto"
             >
+              <button
+                onClick={() => setShowMenu(false)}
+                className="absolute top-4 right-4 text-gray-700 hover:text-gray-800 text-xl font-bold cursor-pointer"
+              >
+                X
+              </button>
+
               {/* Titolo + barra di ricerca */}
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold mb-2">Primo anno:</h2>
-                <div className="bg-white flex px-1 py-1 rounded-full border border-blue-500 overflow-hidden max-w-md">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                <h2 className="text-lg font-semibold">Primo anno:</h2>
+                <div className="flex px-1 py-1 rounded-full border border-blue-500 overflow-hidden w-full sm:max-w-md">
                   <input
                     type="text"
                     placeholder="Cerca corso..."
@@ -457,7 +456,7 @@ export default function App() {
               </div>
 
               {/* Primo anno */}
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-2 mb-4">
                 {tempCourses
                   .filter((course) => course.anno === 1)
                   .filter((course) =>
@@ -467,7 +466,7 @@ export default function App() {
                     <button
                       key={course.name}
                       onClick={() => toggleTempCourse(course.name)}
-                      className={`px-4 py-2 rounded cursor-pointer ${
+                      className={`px-4 py-2 rounded-lg cursor-pointer w-full sm:w-auto ${
                         course.active
                           ? "bg-blue-500 text-white"
                           : "bg-gray-200 text-gray-800"
@@ -480,7 +479,7 @@ export default function App() {
 
               {/* Secondo anno */}
               <h2 className="text-lg font-semibold mb-2 mt-7">Secondo anno:</h2>
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-2 mb-4">
                 {tempCourses
                   .filter((course) => course.anno === 2)
                   .filter((course) =>
@@ -490,7 +489,7 @@ export default function App() {
                     <button
                       key={course.name}
                       onClick={() => toggleTempCourse(course.name)}
-                      className={`px-4 py-2 rounded cursor-pointer ${
+                      className={`px-4 py-2 rounded-lg cursor-pointer w-full sm:w-auto ${
                         course.active
                           ? "bg-emerald-500 text-white"
                           : "bg-gray-200 text-gray-800"
@@ -502,13 +501,7 @@ export default function App() {
               </div>
 
               {/* Pulsanti azione */}
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setShowMenu(false)}
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                >
-                  Annulla
-                </button>
+              <div className="flex flex-col sm:flex-row justify-end gap-4 mt-4">
                 <button
                   onClick={saveCourses}
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
